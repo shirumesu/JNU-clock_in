@@ -73,10 +73,11 @@
    
 ## 它是怎么做到的
 
-- 模拟浏览器自动打卡: [Microsoft-playwright-python](https://github.com/microsoft/playwright-python)
+- 模拟浏览器自动打卡: [Selenium](https://github.com/SeleniumHQ/selenium)
+- 分析滑条验证: [aircv](https://github.com/NetEaseGame/aircv)
 - 彩色日志: [loguru](https://github.com/Delgan/loguru)
 
-~~强烈安利以上两款~~
+~~强烈安利以上三款~~
 
 ## TODO
 如果该打卡系统未来会保持使用（2021/9/26编辑:?还要打卡一年?cnm!), 将进行更好的优化  
