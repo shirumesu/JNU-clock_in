@@ -113,18 +113,10 @@ class sel:
             img_url.append(element.get_attribute("src"))
 
             sync_uio.save_file(
-                type="url_image",
-                url=img_url[0],
-                save_name="target",
-                save_path="./",
-                file_extension=".png",
+                type="url_image", url=img_url[0], save_path="./target.png"
             )
             sync_uio.save_file(
-                type="url_image",
-                url=img_url[1],
-                save_name="template",
-                save_path="./",
-                file_extension=".png",
+                type="url_image", url=img_url[1], save_path="./template.png"
             )
 
         get_img()
@@ -159,7 +151,7 @@ class sel:
     def input_data(self) -> None:
         temperture = self.driver.find_element_by_xpath('//*[@id="temperature"]')
         temperture.clear()
-        temperture.send_keys(self.config["temperture"])
+        temperture.send_keys(str(self.config["temperture"]))
         province = Select(
             self.driver.find_element_by_xpath('//*[@id="selectProvince"]')
         )
@@ -171,7 +163,7 @@ class sel:
         )
         district.select_by_visible_text(self.config["district"])
         self.driver.find_element_by_xpath('//*[@id="10000"]').click()
-        logger.self.config("最后检查时间: 5s\n 5s后提交")
+        logger.info("最后检查时间: 5s\n 5s后提交")
         time.sleep(5)
         self.driver.find_element_by_xpath('//*[@id="tj"]').click()
 
