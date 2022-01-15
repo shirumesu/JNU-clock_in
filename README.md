@@ -25,7 +25,7 @@
    - [IE](https://www.selenium.dev/downloads)
    - [Opera](https://github.com/operasoftware/operachromiumdriver/releases)
    - Safari(内置(前提是你是mac有安装safari))
-    
+   > **如果是Chrome-drive(或者说目前我仅使用这个,对其他浏览器内核的情况不清楚)请务必确保内核版本与你的浏览器版本兼容,否则会无法启动**
 
 4. 将`config_simple.json`改为`config.json`并用记事本打开根据说明编辑
 
@@ -54,7 +54,11 @@
   - 不停在刷新验证码(因为识别不到缺口)
   - 停着没干事(可能在下载验证码图片/等待某些操作完成)
 
+- 抱歉，我太懒了，这确实并非是一个完善的项目，仅限于 **能跑** 总之在我电脑上能跑
+
 - 本作者完全不知道代码在干嘛,会产生怎么样的后果。总而言之,祝你好运(笑)
+
+
 
 ## 为什么写此项目
 
