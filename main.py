@@ -12,19 +12,33 @@ from selenium.webdriver.support.ui import Select
 
 from exception import *
 
+logger = set_logger(level="DEBUG")
+
 
 class sel:
     def __init__(
         self, chromium_path: str = "./chromedriver.exe", config_path="./config.json"
     ) -> None:
         self.chrome = chromium_path
+        logger.debug(f"输入的chromdriver路径为: {chromium_path}")
         self.config_path = config_path
         try:
-            self.driver = webdriver.Chrome(self.chrome)
-        except:
+            logger.info("正在尝试启动chromedriver")
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_argument("--no-sandbox")
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--window-size=1920,1080")
+            chrome_options.add_argument(
+                "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36"
+            )
+            self.driver = webdriver.Chrome(self.chrome, chrome_options=chrome_options)
+        except Exception as e:
+            logger.error(e)
             self._raise(msg="请确保传入正确的chromedirver路径/根目录存在chromdriver", exit_code=0)
-        self.driver.get("https://stuhealth.jnu.edu.cn/#/login")
+
         self.load_config()
+        logger.info("正在尝试访问: https://stuhealth.jnu.edu.cn/#/login")
+        self.driver.get("https://stuhealth.jnu.edu.cn/#/login")
 
     def _raise(
         self, exception: Exception = None, msg: str = "发生错误", exit_code: int = 0
@@ -36,7 +50,21 @@ class sel:
         time.sleep(3)
         sys.exit(exit_code)
 
+    def load_config(self) -> None:
+        try:
+            with open(self.config_path, "r", encoding="utf-8") as f:
+                self.config = json.load(f)
+                if not self.config["temperture"]:
+                    self.config["temperture"] = round(random.uniform(36.1, 36.9), 1)
+                    logger.debug(f"即将填入的温度为: {self.config['temperture']}")
+            logger.info("配置加载成功！")
+        except (json.JSONDecodeError, FileNotFoundError):
+            self._raise(msg="配置config.json未正确配置,请确保按说明填写并且在同文件夹下\n 三秒后将退出")
+        except Exception as e:
+            self._raise(msg=str(e))
+
     def input_passwd(self) -> None:
+        logger.info("正在尝试登录")
         login_windows = self.driver.find_element_by_xpath('//*[@id="zh"]')
         passwd_windows = self.driver.find_element_by_xpath('//*[@id="passw"]')
         self.login_button = self.driver.find_element_by_xpath(
@@ -45,17 +73,6 @@ class sel:
         login_windows.send_keys(self.config["user_name"])
         passwd_windows.send_keys(self.config["passwd"])
 
-    def load_config(self) -> None:
-        try:
-            with open(self.config_path, "r", encoding="utf-8") as f:
-                self.config = json.load(f)
-                if not self.config["temperture"]:
-                    self.config["temperture"] = round(random.uniform(36.1, 36.9), 1)
-        except (json.JSONDecodeError, FileNotFoundError):
-            self._raise(msg="配置config.json未正确配置,请确保按说明填写并且在同文件夹下\n 三秒后将退出")
-        except Exception as e:
-            self._raise(msg=str(e))
-
     def match_temp(self):
         def match(target: str, template: str) -> int:
             img_rgb = cv2.imread(target)
@@ -63,7 +80,6 @@ class sel:
             template = cv2.imread(template, 0)
             run = 1
             w, h = template.shape[::-1]
-            print(w, h)
             res = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
             run = 1
 
@@ -73,16 +89,14 @@ class sel:
             while run < 20:
                 run += 1
                 threshold = (R + L) / 2
-                print(threshold)
                 if threshold < 0:
                     print("Error")
                     return None
                 loc = np.where(res >= threshold)
-                print(len(loc[1]))
                 if len(loc[1]) > 1:
                     L += (R - L) / 2
                 elif len(loc[1]) == 1:
-                    print("目标区域起点x坐标为：%d" % loc[1][0])
+                    print(f"预计目标x坐标为: {loc[1][0]}" % loc[1][0])
                     break
                 elif len(loc[1]) < 1:
                     R -= (R - L) / 2
@@ -135,7 +149,14 @@ class sel:
             )
             return True
         except:
-            return False
+            try:
+                txt = self.driver.find_element_by_xpath(
+                    "/html/body/app-root/app-index/div/div[1]/app-complete/section/section/div/div/div/div/div/div[2]/label"
+                )
+                logger.info(txt.text + ", 即将关闭程序……")
+                sys.exit(0)
+            except:
+                return False
 
     def reflash_temp(self):
         ActionChains(self.driver).move_to_element(
@@ -147,6 +168,7 @@ class sel:
         ).click()
 
     def input_data(self) -> None:
+        logger.info("正在填入各项信息……")
         temperture = self.driver.find_element_by_xpath('//*[@id="temperature"]')
         temperture.clear()
         temperture.send_keys(str(self.config["temperture"]))
@@ -167,16 +189,27 @@ class sel:
 
 
 def main():
-    dv = sel()
-    dv.input_passwd()
+    args = sys.argv[1:]
+    if args and args[0] == "--chrome-path":
+        cp = args[1]
+        dv = sel(chromium_path=cp)
+    else:
+        dv = sel()
 
-    while not dv.match_temp():
-        dv.reflash_temp()
+    def start(dv):
+        dv.input_passwd()
 
-    dv.input_data()
+        while not dv.match_temp():
+            dv.reflash_temp()
 
-    logger.info("提交成功！三秒后关闭!")
-    time.sleep(3)
+        dv.input_data()
+
+        return True
+
+    if start(dv):
+        logger.info("提交成功!三秒后关闭!")
+        time.sleep(3)
+        sys.exit(0)
 
 
 if __name__ == "__main__":

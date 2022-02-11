@@ -43,6 +43,7 @@
     ```
 
 5. **关闭系统代理**，双击打开`main.py`，然后欣赏滑条验证无限尝试吧（逃
+   1. 如果是linux系统,可以使用`python3 main.py --chrome-path /path/to/chromedriver`来指定chrome路径
 
 ## 注意
 
