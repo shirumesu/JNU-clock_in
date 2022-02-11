@@ -3,11 +3,9 @@ import time
 
 import json
 import random
-import requests
 import cv2
 import numpy as np
 from soraha_utils import *
-
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import Select
@@ -176,6 +174,9 @@ def main():
         dv.reflash_temp()
 
     dv.input_data()
+
+    logger.info("提交成功！三秒后关闭!")
+    time.sleep(3)
 
 
 if __name__ == "__main__":
