@@ -1,5 +1,4 @@
 import sys
-from tkinter import N
 import cv2
 import time
 import json
