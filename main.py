@@ -15,6 +15,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 
 import soraha_utils
@@ -198,13 +199,16 @@ class Chrome:
         passwd_windows.send_keys(self.config["passwd"])
 
     def is_clock_in(self) -> bool:
-        ele = self.driver.find_element(
-            By.XPATH,
-            "/html/body/app-root/app-index/div/div[1]/app-complete/section/section/div/div/div/div/div/div[2]/label",
-        )
-        if ele.text == "您已完成今天的健康状态申报":
-            logger.info("您已完成今天的健康状态申报!")
-            return True
+        try:
+            ele = self.driver.find_element(
+                By.XPATH,
+                "/html/body/app-root/app-index/div/div[1]/app-complete/section/section/div/div/div/div/div/div[2]/label",
+            )
+            if ele.text == "您已完成今天的健康状态申报":
+                logger.info("您已完成今天的健康状态申报!")
+                return True
+        except NoSuchElementException:
+            return False
 
 
 class CrackSlider(Chrome):
@@ -378,6 +382,7 @@ if __name__ == "__main__":
     time.sleep(1)
 
     if not cs.is_clock_in():
+        time.sleep(4)
         cs.input_data()
         logger.info("提交成功!")
 
