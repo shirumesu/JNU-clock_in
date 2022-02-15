@@ -112,9 +112,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-chromedriver.exe
 config.json
-target.jpg
-tempr.jpg
-target.png
-template.png
+chrome*
+*.jpg
+*.png

@@ -28,9 +28,24 @@ cs.reflash_temp() # 点击刷新滑条验证图片
     pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
     ```
 
-3. 安装**谷歌浏览器**以及**Chromedriver**并放在`/source/`下
+3. 在根目录创建文件夹`/source/`以及`/images/`用于存放chromedriver以及临时图片
+此时你的项目结构应该如下:
+```
+JNU-CLOCK_IN/
+    │  config_simple.json
+    │  LICENSE
+    │  main.py
+    │  README.md
+    │  requirements.txt
+    │
+    ├─images/
+    │
+    └─source/
+```
 
-4. 将`config_simple.json`改为`config.json`并用记事本打开根据说明编辑
+4. 安装**谷歌浏览器**以及**Chromedriver**并放在`/source/`下
+
+5. 将`config_simple.json`改为`config.json`并用记事本打开根据说明编辑
 
     编辑示例:
     ```Json
@@ -45,7 +60,7 @@ cs.reflash_temp() # 点击刷新滑条验证图片
     }
     ```
 
-5. **关闭系统代理**(或是进入main.py为`cs = CrackSlider()`指定proxy-server)，双击打开`main.py`，然后欣赏滑条验证无限尝试吧（逃
+6. **关闭系统代理**(或是进入main.py为`cs = CrackSlider()`指定proxy-server)，双击打开`main.py`，然后欣赏滑条验证无限尝试吧（逃
    1. 可以使用`python3 main.py --chrome-path /path/to/chromedriver`来指定chrome路径
 
 ## 注意
