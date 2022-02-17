@@ -373,7 +373,7 @@ if __name__ == "__main__":
         #     cs.reflash_temp()
         #     fail = 0
         cs.crack()
-        # fail += 1
+        fail += 1
 
     ele = cs.driver.find_element(
         By.XPATH, "/html/body/app-root/app-login/div[2]/div[2]/form/div[5]/div/button"
