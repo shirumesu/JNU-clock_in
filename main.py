@@ -97,12 +97,6 @@ class Chrome:
         except Exception as e:
             logger.error(f"访问网页 {url} 出现错误: {e}")
             return False
-        self.target_link = self.wait.until(
-            EC.presence_of_element_located((By.CLASS_NAME, "yidun_bg-img"))
-        ).get_attribute("src")
-        self.template_link = self.wait.until(
-            EC.presence_of_element_located((By.CLASS_NAME, "yidun_jigsaw"))
-        ).get_attribute("src")
         return True
 
     def reflash_temp(self):
@@ -276,6 +270,12 @@ class CrackSlider(Chrome):
                 time.sleep(3)
                 raise e
 
+        self.target_link = self.wait.until(
+            EC.presence_of_element_located((By.CLASS_NAME, "yidun_bg-img"))
+        ).get_attribute("src")
+        self.template_link = self.wait.until(
+            EC.presence_of_element_located((By.CLASS_NAME, "yidun_jigsaw"))
+        ).get_attribute("src")
         target_img = __open(self.target_link, self.proxy_dict)
         template_img = __open(self.template_link, self.proxy_dict)
         logger.info("正在保存图片至`./images/`下")
@@ -369,11 +369,11 @@ if __name__ == "__main__":
 
     fail = 0
     while not cs.Slider_Success(fail):
-        if fail == 3:
-            cs.reflash_temp()
-            fail = 0
+        # if fail == 3:
+        #     cs.reflash_temp()
+        #     fail = 0
         cs.crack()
-        fail += 1
+        # fail += 1
 
     ele = cs.driver.find_element(
         By.XPATH, "/html/body/app-root/app-login/div[2]/div[2]/form/div[5]/div/button"
