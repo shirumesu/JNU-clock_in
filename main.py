@@ -166,16 +166,20 @@ class Chrome:
         temperture = self.driver.find_element(By.XPATH, '//*[@id="temperature"]')
         temperture.clear()
         temperture.send_keys(str(self.config["temperture"]))
-        province = Select(
-            self.driver.find_element(By.XPATH, '//*[@id="selectProvince"]')
-        )
-        province.select_by_visible_text(self.config["province"])
-        city = Select(self.driver.find_element(By.XPATH, '//*[@id="selectCity"]'))
-        city.select_by_visible_text(self.config["city"])
-        district = Select(
-            self.driver.find_element(By.XPATH, '//*[@id="selectDistrict"]')
-        )
-        district.select_by_visible_text(self.config["district"])
+        # 如果当前所在地为`在家`则没法使用
+        try:
+            province = Select(
+                self.driver.find_element(By.XPATH, '//*[@id="selectProvince"]')
+            )
+            province.select_by_visible_text(self.config["province"])
+            city = Select(self.driver.find_element(By.XPATH, '//*[@id="selectCity"]'))
+            city.select_by_visible_text(self.config["city"])
+            district = Select(
+                self.driver.find_element(By.XPATH, '//*[@id="selectDistrict"]')
+            )
+            district.select_by_visible_text(self.config["district"])
+        except:
+            logger.info("检查到目前所在地并非为`在外地`, 不需填写详细地址")
         self.driver.find_element(By.XPATH, '//*[@id="10000"]').click()
         logger.info("最后检查时间: 5s\n 5s后提交")
         time.sleep(5)
