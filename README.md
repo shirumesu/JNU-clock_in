@@ -63,6 +63,8 @@ JNU-CLOCK_IN/
 6. **关闭系统代理**(或是进入main.py为`cs = CrackSlider()`指定proxy-server)，双击打开`main.py`，然后欣赏滑条验证无限尝试吧（逃
    1. 可以使用`python3 main.py --chrome-path /path/to/chromedriver`来指定chrome路径
 
+7. 对于windows和linux用户的差距就在`main.py`中的chromedriver，windows为chromedriver.exe，linux为chromedriver，根据需求自改就行了
+
 ## 注意
 
 - 本项目仅适用于`已完成首次打卡`的人(信息会自动记录,其后打卡会自动填入,而本项目仅填写了动态变更需要填写的地方如体温,地址)
