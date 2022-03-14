@@ -3,4 +3,3 @@ opencv_python==4.5.5.62
 Pillow==9.0.1
 requests==2.27.1
 selenium==4.1.0
-soraha_utils==0.0.17
