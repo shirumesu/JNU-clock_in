@@ -207,6 +207,10 @@ class Chrome:
                 return True
         except NoSuchElementException:
             return False
+        
+     def close_driver(self) -> None:
+        self.driver.close()
+        self.driver.quit()        
 
 
 class CrackSlider(Chrome):
@@ -389,6 +393,6 @@ if __name__ == "__main__":
         time.sleep(4)
         cs.input_data()
         logger.info("提交成功!")
-
+    cs.close_driver()
     logger.info("三秒后即将退出程序")
     time.sleep(3)
