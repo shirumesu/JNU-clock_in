@@ -399,7 +399,7 @@ if __name__ == "__main__":
         time.sleep(4)
         try:
             cs.input_data()
-        except selenium.common.exceptions.NoSuchElementException:
+        except Exception:
             logger.error("已经登陆过，请勿重复登录")
         logger.info("提交成功!")
     cs.close_driver()
