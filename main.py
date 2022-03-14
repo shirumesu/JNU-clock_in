@@ -21,8 +21,13 @@ import logging
 
 # import soraha_utils
 
-
-logger = logging.getLogger(__name__)
+## 日志打印
+logger = logging.getLogger("打卡")
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 class Chrome:
@@ -392,7 +397,10 @@ if __name__ == "__main__":
 
     if not cs.is_clock_in():
         time.sleep(4)
-        cs.input_data()
+        try:
+            cs.input_data()
+        except selenium.common.exceptions.NoSuchElementException:
+            logger.error("已经登陆过，请勿重复登录")
         logger.info("提交成功!")
     cs.close_driver()
     logger.info("三秒后即将退出程序")
