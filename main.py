@@ -17,11 +17,12 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
+import logging 
 
-import soraha_utils
+# import soraha_utils
 
 
-logger = soraha_utils.set_logger(level="DEBUG")
+logger = logging.getLogger(__name__)
 
 
 class Chrome:
@@ -32,7 +33,6 @@ class Chrome:
         wait_timeout: int = 20,
     ) -> None:
         """初始化并建立一个chromedriver
-
         Args:
             chromium_path (str, optional): chromdriver路径. Defaults to "./source/chromedriver.exe".
             proxy_server (Optional[str], optional): 代理服务器(可选),格式参考: `127.0.0.1:8080`. Defaults to None.
@@ -207,16 +207,17 @@ class Chrome:
                 return True
         except NoSuchElementException:
             return False
-        
-     def close_driver(self) -> None:
+
+    def close_driver(self) -> None:
         self.driver.close()
-        self.driver.quit()        
+        self.driver.quit()
+
 
 
 class CrackSlider(Chrome):
     def __init__(
         self,
-        chromium_path: str = "./source/chromedriver.exe",
+        chromium_path: str = "./source/chromedriver",
         url: str = "https://stuhealth.jnu.edu.cn/#/login",
         proxy_server: Optional[str] = None,
     ) -> None:
@@ -396,3 +397,4 @@ if __name__ == "__main__":
     cs.close_driver()
     logger.info("三秒后即将退出程序")
     time.sleep(3)
+
