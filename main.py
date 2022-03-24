@@ -18,6 +18,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 import logging 
+import datetime, time
 
 # import soraha_utils
 
@@ -74,9 +75,15 @@ class Chrome:
         try:
             with open("./config.json", "r", encoding="utf-8") as f:
                 self.config = json.load(f)
-                if not self.config["temperture"]:
-                    self.config["temperture"] = round(random.uniform(36.1, 36.9), 1)
-                    logger.debug(f"即将填入的温度为: {self.config['temperture']}")
+                if not self.config["temperture1"]:
+                    self.config["temperture1"] = round(random.uniform(36.1, 36.9), 1)
+                    logger.debug(f"即将填入的晨检温度为: {self.config['temperture1']}")
+                if not self.config["temperture2"]:
+                    self.config["temperture2"] = round(random.uniform(36.1, 36.9), 1)
+                    logger.debug(f"即将填入的午检温度为: {self.config['temperture2']}")
+                if not self.config["temperture3"]:
+                    self.config["temperture3"] = round(random.uniform(36.1, 36.9), 1)
+                    logger.debug(f"即将填入的晚检温度为: {self.config['temperture3']}")
             logger.info("配置加载成功!")
         except (json.JSONDecodeError, FileNotFoundError) as e:
             logger.error("配置config.json未正确配置,请确保按说明填写并且在同文件夹下!")
@@ -159,18 +166,68 @@ class Chrome:
         except:
             pass
         if slide.rect["width"] > 2:
-            logger.info("验证还就内个成昆怎么说?")
+            logger.info("验证成功！")
             return True
         else:
             logger.info(
-                "失败了捏,你可选的解决方案:\n1. [ 不推荐 ]等待这该死的程序自动重试并无所事事的看着\n2. [ 推荐 ]即刻关注`嘉然今天吃什么`来迅速度过无聊的重试时间: https://space.bilibili.com/672328094"
+                "验证失败，等待继续验证"
             )
 
     def input_data(self) -> None:
         logger.info("正在填入各项信息……")
-        temperture = self.driver.find_element(By.XPATH, '//*[@id="temperature"]')
-        temperture.clear()
-        temperture.send_keys(str(self.config["temperture"]))
+        ## 晨检信息
+        try:
+            logger.info("正在填入晨检体温")
+            temperture = self.driver.find_element(By.XPATH, '//*[@id="cjtw"]')
+            temperture.clear()
+            # temperture.send_keys(str(self.config["temperture"]))
+            temperture.send_keys(str(self.config["temperture1"]))
+        except:
+            logger.error("填入晨检体温失败")
+        try:
+            logger.info("正在填入晨检体温日期")
+            self.driver.execute_script("document.getElementById('twyjcrq').removeAttribute('readonly')")
+            input_date = self.driver.find_element(By.XPATH, '//*[@id="twyjcrq"]')
+            input_date.clear()
+            input_date.send_keys(str(datetime.date.today()))
+            # driver.execute_script(js)
+        except:
+            logger.error("填入晨检体温日期失败")
+        ## 午检信息
+        try:
+            logger.info("正在填入午检体温")
+            temperture = self.driver.find_element(By.XPATH, '//*[@id="wujtw"]')
+            temperture.clear()
+            temperture.send_keys(str(self.config["temperture2"]))
+        except:
+            logger.error("填入午检体温失败")
+
+        try:
+            logger.info("正在填入午检体温日期")
+            self.driver.execute_script("document.getElementById('twejcrq').removeAttribute('readonly')")
+            input_date = self.driver.find_element(By.XPATH, '//*[@id="twejcrq"]')
+            input_date.clear()
+            input_date.send_keys(str(datetime.date.today()))
+        except:
+            logger.error("填入午检体温日期失败")
+        ## 晚检信息
+        try:
+            logger.info("正在填入晚检体温")
+            temperture = self.driver.find_element(By.XPATH, '//*[@id="wajtw"]')
+            temperture.clear()
+            temperture.send_keys(str(self.config["temperture3"]))
+        except:
+            logger.error("填入晚检体温失败")
+        try:
+            logger.info("正在填晚午检体温日期")
+            self.driver.execute_script("document.getElementById('twsjcrq').removeAttribute('readonly')")
+            input_date = self.driver.find_element(By.XPATH, '//*[@id="twsjcrq"]')
+            input_date.clear()
+           
+            input_date.send_keys(str(self.getYesterday()))
+        except:
+            logger.error("填入晚午检体温日期失败")
+            #logger.error("填入晚检体温日期失败")
         # 如果当前所在地为`在家`则没法使用
         try:
             province = Select(
@@ -216,6 +273,13 @@ class Chrome:
     def close_driver(self) -> None:
         self.driver.close()
         self.driver.quit()
+
+    def getYesterday(self) -> str: 
+        today=datetime.date.today() 
+        oneday=datetime.timedelta(days=1) 
+        yesterday=today-oneday  
+        return yesterday
+    
 
 
 
@@ -405,4 +469,3 @@ if __name__ == "__main__":
     cs.close_driver()
     logger.info("三秒后即将退出程序")
     time.sleep(3)
-
