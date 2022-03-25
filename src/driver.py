@@ -295,6 +295,18 @@ class Chrome:
                 logger.info("您已完成今天的健康状态申报!")
                 return True
         except NoSuchElementException:
+            try:
+                ele2 = self.driver.find_element(
+                    By.XPATH,
+                    "/html/body/app-root/app-index/div/div[1]/app-cantwrite/section/section/div/div/div/div/div/div[2]/label",
+                )
+                if ele2.text == "距离您上一次健康申报间隔还不足6小时，请稍后再试":
+                    logger.info("距离您上一次健康申报间隔还不足6小时，请稍后再试…")
+                    return True
+            except NoSuchElementException:
+                return False
+        except Exception as e:
+            logger.debug(f"判断打卡状态发生错误({e}), 无法判断当前是否打卡了, 尝试继续打卡")
             return False
 
     def close_driver(self) -> None:

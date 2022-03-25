@@ -30,6 +30,8 @@ if __name__ == "__main__":
 
     # 检查是否已经成功打卡 如果是 退出程序
     if chrome.is_clock_in():
+        logger.info("程序即将退出!")
+        time.sleep(1)
         sys.exit(0)
 
     # 输入温度、当前所在地等信息提交
