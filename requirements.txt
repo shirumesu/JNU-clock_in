@@ -1,5 +1,6 @@
+loguru==0.6.0
 numpy==1.22.2
 opencv_python==4.5.5.62
 Pillow==9.0.1
 requests==2.27.1
-selenium==4.1.0
+selenium==4.1.3

@@ -2,15 +2,7 @@
 
 用于自动完成[暨南大学健康打卡](https://stuhealth.jnu.edu.cn/#/login)所写的简单python  
 
-如果你是因为搜索`网易易盾`、`滑条验证`等字眼进入的本仓库,那么你可以看看下面的内容:  
-实际上由于暨南大学健康打卡中滑条验证使用的网易易盾, 本项目代码也提供了简单的接口和类进行滑条验证的破解(当然代码需要自己扒, 祝好运)
-```python3
-# 具体参数传入请到时候参照注释
-cs = CrackSlider() # 创建一个网易易盾破解类并启动selenium的chromdriver无头浏览器
-cs.crack() # 保存图片->计算->滑条验证一连串
-cs.Slider_Success() # ->bool :是否成功通过滑条验证
-cs.reflash_temp() # 点击刷新滑条验证图片
-```
+如果你是因为搜索**网易易盾**、**滑条验证**等字眼进入的本仓库,那么可以直接拿`./src/yidun.py`去用(直接调用`yidun().crack()`即可):  
 
 ## 使用本项目
 
@@ -28,93 +20,82 @@ cs.reflash_temp() # 点击刷新滑条验证图片
     pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
     ```
 
-3. 在根目录创建文件夹`/source/`以及`/images/`用于存放chromedriver以及临时图片
+3. 在根目录创建文件夹`/source/`用于存放chromedriver
 此时你的项目结构应该如下:
 ```
-JNU-CLOCK_IN/
-    │  config_simple.json
-    │  LICENSE
-    │  main.py
-    │  README.md
-    │  requirements.txt
-    │
-    ├─images/
-    │
-    └─source/
+JNU-CLOCK_IN
+│  .gitattributes
+│  .gitignore
+│  LICENSE
+│  main.py
+│  README.md
+│  requirements.txt
+│      
+├─source
+│      chromedriver.exe
+│      
+└─src
+       config.py
+       driver.py
+       yidun.py
 ```
 
-4. 安装**谷歌浏览器**以及**Chromedriver**并放在`/source/`下
+4. 下载对应版本的[Chromedriver](https://chromedriver.chromium.org/)并解压放在`/source/`下
+   1. 请确保你安装了[谷歌浏览器(Chrome)](https://www.google.com/intl/zh-CN/chrome/)
 
-5. 将`config_simple.json`改为`config.json`并用记事本打开根据说明编辑
+5. **关闭系统代理(重要)**然后启动`main.py`
+   1. 强烈推荐在命令行(偷偷安利 [Windows Terminal](https://github.com/microsoft/terminal) )中使用`python ./main.py`启动
+   2. 这样结束可以保留窗口以及输出 防止报错直接跳出去了什么都看不到
 
-    编辑示例:
-    ```Json
-    {
-        "user_name": "20991512350", // 此处为学号, 你登录的用户名
-        "passwd": "12345678", // 此处为密码
-        "temperture": "", // 温度,可填可不填(不填自动生成由36.2~36.9的温度)
-        "province": "广东省", // 需要自己去下拉框看,打出对应文本即可,必须每个字对上
-        "city": "广州市",
-        "district": "番禺区" // 如香港这种没有district的,请输入`请选择`如下:
-        // "district": "请选择"
-    }
-    ```
+## 注意 / 须知
 
-6. **关闭系统代理**(或是进入main.py为`cs = CrackSlider()`指定proxy-server)，双击打开`main.py`，然后欣赏滑条验证无限尝试吧（逃
-   1. 可以使用`python3 main.py --chrome-path /path/to/chromedriver`来指定chrome路径
+- 程序会自动识别windows或是linux系统, 并自动尝试寻找`/source/chromedriver.exe`或是`/source/chromedriver`
+- 首次使用需要根据要求输入对应的当前所在地
+  - 如果后续需要修改可以：
+    - 打开`/source/config.json`修改内容(请确保你修改的内容正确)
+    - 删除`/source/config.json`
 
-7. 对于windows和linux用户的差距就在`main.py`中的chromedriver，windows为chromedriver.exe，linux为chromedriver，根据需求自改就行了
+- 有关体温：
+  - 温度自动在 \[36.1,36.9\] 区间中生成, 可能存在上午36.1 中午36.9 晚上36.1的大幅度浮动情况
+  - 按要求为早上为当天，午间以及晚上为昨天，如果有需要改请打开`/src/driver.py`修改101-103行的传入的布尔值一项(具体自己看函数注释)
 
-## 注意
-
-- 本项目仅适用于`已完成首次打卡`的人(信息会自动记录,其后打卡会自动填入,而本项目仅填写了动态变更需要填写的地方如体温,地址)
+- 本项目**仅**适用于已完成首次打卡的人(而本项目仅会填写当日体温当前所在地地址)
   
-- 本项目**不保证**没有bug, 请注意是否出现了打卡成功的页面, 并且请留意python窗口的输出
-  - 2022/2/15: 已经基本重构结束, 代码相对完善, 理论不会再出现问题(当然欢迎提交issue)
-    - 因为我看github频率取决于我摸不摸鱼, 一直没有留意到有两个issue非常抱歉
+- 本项目**不保证**没有bug, 请注意是否打印了`提交成功`字样
 
 - 你可能遇到的`正常`情况:
-  - 一直失败(除非次数实在多的出奇,否则可能只是单纯运气不好……)
-    - 如果多的出奇, 可能是打卡网站采取了新的风控政策, 会尽可能及时更改
-  - 停着没干事(可能在下载验证码图片/等待某些操作完成)
-
-- 抱歉，我太懒了，这确实并非是一个完善的项目，仅限于 **能跑** 总之在我电脑上能跑
-  - 2022/2/15: 哈哈, 爷写完辣！
+  - 停着没干事(可能在下载验证码图片/等待某些操作完成)，总之没有报错就是胜利！
 
 - 本作者完全不知道代码在干嘛,会产生怎么样的后果。总而言之,祝你好运(笑)
 
 ## 为什么写此项目
 
 - 无聊
-   
-## ~~适用人群~~
-
-- 已进行过`首次打卡`的人
-- 无聊想搞点新东西的人
-- 想学学`selenium`的人(~~这有最简单的代码~~)
+- 你妈的 打卡算分！
 
 ## 它用来干什么?
 
 - 进行暨南大学学生健康系统的自动打卡
-- 目前可在`配置后`实现自动输入体温,地址,点击以上信息真实按钮并提交
+- 将滑条验证的一部分单独抽出, 可用于其他地方的滑条验证
    
 ## 它是怎么做到的
 
 - 模拟浏览器自动打卡: [Selenium](https://github.com/SeleniumHQ/selenium)
-- 分析滑条验证: [aircv](https://github.com/NetEaseGame/aircv)
 - 彩色日志: [loguru](https://github.com/Delgan/loguru)
 
-~~强烈安利以上三款~~
-
-## TODO
-如果该打卡系统未来会保持使用（2021/9/26编辑:?还要打卡一年?cnm!), 将进行更好的优化  
-`以下TODO的前提为上面一行`
-
-~~将playwright替换为selenium,使用pyinstaller打包为exe(2021/9/6编辑:你在说个寄吧 selenium打包不一样很难)~~
-- [ ] 询问更多信息,实现第一次就可以直接自动填入所有项
-- [x] 不再需要用户使用F12获取地区value, 而是通过询问的方式(2021-9-26编辑:不用填数字id而是文字了,算是搞定了吧（
+~~强烈安利~~
 
 ## 更新(顺便记录爬虫攻防?)
+### 2022/3/25
+  - 说明:
+    - tnnd 跟我玩阴的是吧 一天三次温度检测 哈哈！我是百变温度怪！哗！吓死你！
+  - 新增:
+    - 首次使用会自动询问账号密码以及当前所在地
+  - 移除:
+    - 需要手动修改输入config.json
+    - 可选的输入当日体温, 现在强制为随机填写
+  - 优化:
+    - 重写, 将 yidun 以及 config 单独拿出来了
 ### 2022/2/15
   - 说明:
     - 由于网站加入对webdriver的验证导致失效, 因此代码大规模重构
@@ -124,8 +105,8 @@ JNU-CLOCK_IN/
     - 代码结构
     - 滑条验证准确度
     - 更多的日志提醒
-## 感谢
 
+## 感谢
 - 来自我自身的高效且稳定的精神支持
 - 作为死宅多余的空闲时间
 - 各种文章
