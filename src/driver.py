@@ -245,7 +245,6 @@ class Chrome:
         while tracks:
             x = tracks.pop(0)
             ActionChains(self.driver).move_by_offset(xoffset=x, yoffset=0).perform()
-        time.sleep(0.05)
         ActionChains(self.driver).release().perform()
 
     def Slider_Success(self) -> bool:

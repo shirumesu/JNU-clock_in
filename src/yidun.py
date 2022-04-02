@@ -85,4 +85,8 @@ class yidun:
             tracks.append(offset - offsets[-1])
             offsets.append(offset)
         tracks.extend([-3, -2, -3, -2, -2, -2, -2, -1, -0, -1, -1, -1])
+
+        while 0 in tracks:
+            tracks.remove(0)
+
         return tracks
