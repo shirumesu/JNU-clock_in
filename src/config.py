@@ -5,25 +5,62 @@ from loguru import logger
 
 
 class Config:
-    def __init__(self) -> None:
-        self.UserName = None
-        self.Passwd = None
-        self.Province = None
-        self.City = None
-        self.District = None
-        try:
-            self.load_config()
-        except Exception as e:
-            logger.info("检测到首次运行此程序, 在稍后会要求输入信息")
+    def __init__(self, reset: bool = False) -> None:
+        self.load_config(reset)
 
-    def load_config(self) -> None:
-        with open("./source/config.json", "r", encoding="utf-8") as f:
-            dt = json.load(f)
-        self.UserName = dt["UserName"]
-        self.Passwd = dt["Passwd"]
-        self.Province = dt["Province"]
-        self.City = dt["City"]
-        self.District = dt["District"]
+        if self.send_mail is None:
+            ans = input("请问是否需要邮件推送?\n1.需要\n2.不需要\n请回复数字:")
+            self.send_mail = not (int(ans) - 1)
+            self.dump()
+        if self.send_mail and not (self.sender and self.pw and self.receiv):
+            suc = False
+            while not suc:
+                self.sender = input("请输入发件人邮箱(可以自己发送给自己): ")
+                self.pw = input(
+                    "请输入发件人密码(qq,163为授权码, 获取方式请见 https://service.mail.qq.com/cgi-bin/help?subtype=1&id=28&no=1001256 请开启 POP3/SMTP or IMAP/SMTP): "
+                )
+                self.receiv = input("请输入收件人邮箱, 需要群发请用空格隔开多个邮箱: ").split(" ")
+                s = input(
+                    "邮件推送配置成功!\n"
+                    f"发件人: {self.sender}\n"
+                    f"发件人密码: {self.pw}\n"
+                    f"收件人: {self.receiv}\n"
+                    f"如果有错误请输入 -1 否则请按enter"
+                )
+                if s and int(s) == -1:
+                    continue
+                else:
+                    self.dump()
+                    break
+
+    def load_config(self, reset: bool) -> None:
+        try:
+            if reset:
+                raise RuntimeError
+            with open("./source/config.json", "r", encoding="utf-8") as f:
+                dt = json.load(f)
+            self.UserName = dt["UserName"]
+            self.Passwd = dt["Passwd"]
+            self.Province = dt["Province"]
+            self.City = dt["City"]
+            self.District = dt["District"]
+
+            self.send_mail = dt["send_mail"]
+            self.sender = dt["sender"]
+            self.pw = dt["mail_pw"]
+            self.receiv = dt["receiv"]
+        except Exception as e:
+            logger.info("检测到首次运行此程序, 在稍后会要求输入信息……")
+            self.UserName = None
+            self.Passwd = None
+            self.Province = None
+            self.City = None
+            self.District = None
+
+            self.send_mail = None
+            self.sender = None
+            self.pw = None
+            self.receiv = None
 
     def get_user(self, Re: bool = False) -> list[str]:
         if Re or not (self.UserName and self.Passwd):
@@ -62,6 +99,10 @@ class Config:
                     "Province": self.Province,
                     "City": self.City,
                     "District": self.District,
+                    "send_mail": self.send_mail,
+                    "sender": self.sender,
+                    "mail_pw": self.pw,
+                    "receiv": self.receiv,
                 },
                 f,
                 ensure_ascii=False,

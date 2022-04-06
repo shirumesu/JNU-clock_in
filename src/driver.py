@@ -19,9 +19,9 @@ from .yidun import yidun
 
 
 class Chrome:
-    def __init__(self) -> None:
+    def __init__(self, config: Config = None) -> None:
         """初始化并建立一个chromedriver"""
-        self.Config = Config()
+        self.Config = Config() if not config else config
         self.yidun = yidun()
 
         if platform.system().lower() == "linux":
@@ -93,16 +93,15 @@ class Chrome:
         Returns:
             bool: 是否成功
         """
-
         logger.info("正在填入各项信息……")
         logger.info("正在填入温度……")
-        self.input_temp('//*[@id="cjtw"]', '//*[@id="twyjcrq"]', True)
-        self.input_temp('//*[@id="wujtw"]', '//*[@id="twejcrq"]', False)
-        self.input_temp('//*[@id="wajtw"]', '//*[@id="twsjcrq"]', False)
+        t1 = self.input_temp('//*[@id="cjtw"]', '//*[@id="twyjcrq"]', True)
+        t2 = self.input_temp('//*[@id="wujtw"]', '//*[@id="twejcrq"]', False)
+        t3 = self.input_temp('//*[@id="wajtw"]', '//*[@id="twsjcrq"]', False)
 
         # 如果当前所在地为`在家`则没法使用
         try:
-            self.input_living()
+            lv = self.input_living()
         except Exception as e:
             logger.info("检查到目前所在地并非为`在外地`, 不需填写详细地址")
             logger.debug(f"跳过原因:{e}")
@@ -111,7 +110,7 @@ class Chrome:
         logger.info("最后检查时间: 5s\n 5s后提交")
         time.sleep(5)
         self.driver.find_element(By.XPATH, '//*[@id="tj"]').click()
-        return True
+        return [True, t1, t2, t3, lv]
 
     def input_living(self) -> None:
         """自动填入当前所在地"""
@@ -195,13 +194,15 @@ class Chrome:
             temp_xpath,
         )
         temperture.clear()
-        temperture.send_keys(self.Config.random_temp())
+        tmp = self.Config.random_temp()
+        temperture.send_keys(tmp)
 
         date = self.driver.find_element(By.XPATH, date_xpath)
         ActionChains(self.driver).click(date).perform()
         if not today:
             date.send_keys(Keys.LEFT)
         date.send_keys(Keys.ENTER)
+        return [tmp, today]
 
     def save_img(self) -> None:
         """保存验证码图片用作计算"""
