@@ -46,6 +46,8 @@ if __name__ == "__main__":
 
     # 检查是否已经成功打卡 如果是 退出程序
     if chrome.is_clock_in():
+        msg = "打卡失败!原因可能为:\n1. 您已完成今天的健康状态申报!\n2. 距离您上一次健康申报间隔还不足6小时\n请稍后再试"
+        mail.send_email("【暨南大学打卡程序推送】", msg)
         logger.info("程序即将退出!")
         time.sleep(1)
         sys.exit(0)
