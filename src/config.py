@@ -5,8 +5,8 @@ from loguru import logger
 
 
 class Config:
-    def __init__(self, reset: bool = False) -> None:
-        self.load_config(reset)
+    def __init__(self, reset: bool = False, reset_living: bool = False) -> None:
+        self.load_config(reset, reset_living)
 
         if self.send_mail is None:
             ans = input("请问是否需要邮件推送?\n1.需要\n2.不需要\n请回复数字:")
@@ -33,22 +33,31 @@ class Config:
                     self.dump()
                     break
 
-    def load_config(self, reset: bool) -> None:
+    def load_config(self, reset: bool, reset_living: bool) -> None:
         try:
             if reset:
                 raise RuntimeError
             with open("./source/config.json", "r", encoding="utf-8") as f:
                 dt = json.load(f)
-            self.UserName = dt["UserName"]
-            self.Passwd = dt["Passwd"]
-            self.Province = dt["Province"]
-            self.City = dt["City"]
-            self.District = dt["District"]
-
             self.send_mail = dt["send_mail"]
             self.sender = dt["sender"]
             self.pw = dt["mail_pw"]
             self.receiv = dt["receiv"]
+            self.UserName = dt["UserName"]
+            self.Passwd = dt["Passwd"]
+            if reset_living:
+                self.Province = None
+                self.City = None
+                self.District = None
+                self.Living = None
+                self.other_city = None
+            else:
+                self.Province = dt["Province"]
+                self.City = dt["City"]
+                self.District = dt["District"]
+                self.Living = dt["Living"]
+                self.other_city = dt["other_city"]
+
         except Exception as e:
             logger.info("检测到首次运行此程序, 在稍后会要求输入信息……")
             self.UserName = None
@@ -56,6 +65,8 @@ class Config:
             self.Province = None
             self.City = None
             self.District = None
+            self.Living = None
+            self.other_city = None
 
             self.send_mail = None
             self.sender = None
@@ -79,15 +90,23 @@ class Config:
 
     def get_living(self) -> Union[List[str], None]:
         return (
-            [self.Province, self.City, self.District]
-            if (self.Province and self.City and self.District)
-            else None
+            [self.Province, self.City, self.District, self.Living, self.other_city]
+            if (
+                self.Province
+                and self.City
+                and self.District
+                and self.Living
+                and self.other_city
+            )
+            else None * 5
         )
 
-    def set_living(self, P, C, D) -> None:
+    def set_living(self, P, C, D, L, O) -> None:
         self.Province = P
         self.City = C
         self.District = D
+        self.Living = L
+        self.other_city = O
         self.dump()
 
     def dump(self) -> None:
@@ -99,6 +118,8 @@ class Config:
                     "Province": self.Province,
                     "City": self.City,
                     "District": self.District,
+                    "Living": self.Living,
+                    "other_city": self.other_city,
                     "send_mail": self.send_mail,
                     "sender": self.sender,
                     "mail_pw": self.pw,

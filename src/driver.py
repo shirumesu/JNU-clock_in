@@ -102,6 +102,7 @@ class Chrome:
         # 如果当前所在地为`在家`则没法使用
         try:
             lv = self.input_living()
+
         except Exception as e:
             logger.info("检查到目前所在地并非为`在外地`, 不需填写详细地址")
             logger.debug(f"跳过原因:{e}")
@@ -151,10 +152,10 @@ class Chrome:
 
         living = self.Config.get_living()
         if not living:
-            P = C = D = None
+            P = C = D = L = O = None
             save = True
         else:
-            P, C, D = living[0], living[1], living[2]
+            P, C, D, L, O = living[0], living[1], living[2], living[3], living[4]
             save = False
 
         province = Select(
@@ -175,9 +176,31 @@ class Chrome:
         if not D:
             D = __print(district)
         district.select_by_visible_text(D)
+
+        living = self.driver.find_element(By.XPATH, '//*[@id="person_c4"]')
+        living.clear()
+        if not L:
+            L = input("请输入你当前所在地的详细地址（含楼栋及房间号）:\n")
+            ans = input(f"您的输入为: {L}\n如果输入正确请按 enter 否则请输入任意字符")
+            while ans:
+                L = input("请输入你当前所在地的详细地址（含楼栋及房间号）:\n")
+                ans = input(f"您的输入为: {L}\n如果输入正确请按 enter 否则请输入任意字符")
+        living.send_keys(L)
+
+        other_city = self.driver.find_element(By.XPATH, '//*[@id="other_c4"]')
+        other_city.clear()
+        if not O:
+            O = input("请输入你近14天其他驻留城市(如果没有请按enter):\n")
+            ans = input(f"您的输入为: {O}\n如果输入正确请按 enter 否则请输入任意字符")
+            while ans:
+                O = input("请输入你近14天其他驻留城市:\n")
+                ans = input(f"您的输入为: {O}\n如果输入正确请按 enter 否则请输入任意字符")
+        if O:
+            other_city.send_keys(O)
+
         if save:
-            self.Config.set_living(P, C, D)
-        return [P, C, D]
+            self.Config.set_living(P, C, D, L, O)
+        return [P, C, D, L, O]
 
     def input_temp(self, temp_xpath: str, date_xpath: str, today: bool) -> None:
         """自动填入温度
