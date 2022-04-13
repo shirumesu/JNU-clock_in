@@ -10,7 +10,7 @@ from src.config import Config
 from src.driver import Chrome
 from selenium.webdriver import ActionChains
 
-EDIT = "2022-4-12"
+EDIT = "2022-04-13"
 
 if "--help" in sys.argv or "-h" in sys.argv:
     print(
