@@ -98,7 +98,7 @@ class Config:
                 and self.Living
                 and self.other_city
             )
-            else None * 5
+            else [None] * 5
         )
 
     def set_living(self, P, C, D, L, O) -> None:
