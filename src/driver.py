@@ -151,7 +151,7 @@ class Chrome:
             return data.options[int(ans)].text
 
         living = self.Config.get_living()
-        if not living:
+        if not living or None in living:
             P = C = D = L = O = None
             save = True
         else:
