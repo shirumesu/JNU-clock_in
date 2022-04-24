@@ -94,7 +94,7 @@ if __name__ == "__main__":
             if mail:
                 mail.send_email("【暨南大学打卡程序推送】", msg)
         except smtplib.SMTPException as e:
-            logger.warning("无法推送邮件, 请检查配置是否有误\n错误信息: {e}")
+            logger.warning(f"无法推送邮件, 请检查配置是否有误\n错误信息: {e}")
 
         logger.info("程序将于三秒后退出!")
         time.sleep(3)
