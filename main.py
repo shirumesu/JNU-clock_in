@@ -2,7 +2,6 @@ import os
 import sys
 import time
 import smtplib
-import requests
 from loguru import logger
 
 from src.mail import Mail

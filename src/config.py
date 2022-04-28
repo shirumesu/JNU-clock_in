@@ -96,7 +96,7 @@ class Config:
                 and self.City
                 and self.District
                 and self.Living
-                and self.other_city
+                and (self.other_city or self.other_city is None)
             )
             else [None] * 5
         )

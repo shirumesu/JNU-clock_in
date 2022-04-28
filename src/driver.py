@@ -95,9 +95,16 @@ class Chrome:
         """
         logger.info("正在填入各项信息……")
         logger.info("正在填入温度……")
-        t1 = self.input_temp('//*[@id="cjtw"]', '//*[@id="twyjcrq"]', True)
-        t2 = self.input_temp('//*[@id="wujtw"]', '//*[@id="twejcrq"]', False)
-        t3 = self.input_temp('//*[@id="wajtw"]', '//*[@id="twsjcrq"]', False)
+        try:
+            t1 = self.input_temp('//*[@id="cjtw"]', '//*[@id="twyjcrq"]', True)
+            t2 = self.input_temp('//*[@id="wujtw"]', '//*[@id="twejcrq"]', False)
+            t3 = self.input_temp('//*[@id="wajtw"]', '//*[@id="twsjcrq"]', False)
+        except NoSuchElementException as nse:
+            logger.info("未找到对应xpath, 将暂停3s等待页面加载")
+            time.sleep(3)
+            t1 = self.input_temp('//*[@id="cjtw"]', '//*[@id="twyjcrq"]', True)
+            t2 = self.input_temp('//*[@id="wujtw"]', '//*[@id="twejcrq"]', False)
+            t3 = self.input_temp('//*[@id="wajtw"]', '//*[@id="twsjcrq"]', False)
 
         # 如果当前所在地为`在家`则没法使用
         try:
@@ -195,8 +202,7 @@ class Chrome:
             while ans:
                 O = input("请输入你近14天其他驻留城市:\n")
                 ans = input(f"您的输入为: {O}\n如果输入正确请按 enter 否则请输入任意字符")
-        if O:
-            other_city.send_keys(O)
+        other_city.send_keys(O)
 
         if save:
             self.Config.set_living(P, C, D, L, O)
