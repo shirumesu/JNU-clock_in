@@ -11,7 +11,10 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import (
+    NoSuchElementException,
+    ElementNotInteractableException,
+)
 from selenium.webdriver.support import expected_conditions as EC
 
 from .config import Config
@@ -99,12 +102,11 @@ class Chrome:
             t1 = self.input_temp('//*[@id="cjtw"]', '//*[@id="twyjcrq"]', True)
             t2 = self.input_temp('//*[@id="wujtw"]', '//*[@id="twejcrq"]', False)
             t3 = self.input_temp('//*[@id="wajtw"]', '//*[@id="twsjcrq"]', False)
-        except NoSuchElementException as nse:
-            logger.info("未找到对应xpath, 将暂停3s等待页面加载")
-            time.sleep(3)
-            t1 = self.input_temp('//*[@id="cjtw"]', '//*[@id="twyjcrq"]', True)
-            t2 = self.input_temp('//*[@id="wujtw"]', '//*[@id="twejcrq"]', False)
-            t3 = self.input_temp('//*[@id="wajtw"]', '//*[@id="twsjcrq"]', False)
+        except ElementNotInteractableException as nse:
+            logger.error("找到对应xpath, 但与其他元素合并, 猜测为仅需填入当日日期, 将更改填写模式。")
+            t1 = self.input_temp('//*[@id="temperature"]', None, True, True)
+            t2 = None
+            t3 = None
 
         # 如果当前所在地为`在家`则没法使用
         try:
@@ -196,7 +198,7 @@ class Chrome:
 
         other_city = self.driver.find_element(By.XPATH, '//*[@id="other_c4"]')
         other_city.clear()
-        if not O:
+        if O is None:
             O = input("请输入你近14天其他驻留城市(如果没有请按enter):\n")
             ans = input(f"您的输入为: {O}\n如果输入正确请按 enter 否则请输入任意字符")
             while ans:
@@ -208,7 +210,9 @@ class Chrome:
             self.Config.set_living(P, C, D, L, O)
         return [P, C, D, L, O]
 
-    def input_temp(self, temp_xpath: str, date_xpath: str, today: bool) -> None:
+    def input_temp(
+        self, temp_xpath: str, date_xpath: str, today: bool, not_need_day: bool = False
+    ) -> None:
         """自动填入温度
 
         可恶！一天三检！我是百变温度怪咋的
@@ -217,6 +221,7 @@ class Chrome:
             temp_xpath (str): 温度一栏的xpath
             date_xpath (str): 日期一栏的xpath
             today (bool): 是否将日期选择为今天, 否则为昨天(按要求目前仅早上为今天 中午以及晚上温度皆选为昨天)
+            not_need_day (bool): 是否不需要选择日期
         """
         temperture = self.driver.find_element(
             By.XPATH,
@@ -226,11 +231,13 @@ class Chrome:
         tmp = self.Config.random_temp()
         temperture.send_keys(tmp)
 
-        date = self.driver.find_element(By.XPATH, date_xpath)
-        ActionChains(self.driver).click(date).perform()
-        if not today:
-            date.send_keys(Keys.LEFT)
-        date.send_keys(Keys.ENTER)
+        if not not_need_day:
+            date = self.driver.find_element(By.XPATH, date_xpath)
+            ActionChains(self.driver).click(date).perform()
+            if not today:
+                date.send_keys(Keys.LEFT)
+            date.send_keys(Keys.ENTER)
+
         return [tmp, today]
 
     def save_img(self) -> None:

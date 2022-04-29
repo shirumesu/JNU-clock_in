@@ -89,17 +89,30 @@ class Config:
         return str(t)
 
     def get_living(self) -> Union[List[str], None]:
-        return (
-            [self.Province, self.City, self.District, self.Living, self.other_city]
-            if (
-                self.Province
-                and self.City
-                and self.District
-                and self.Living
-                and (self.other_city or self.other_city is None)
-            )
-            else [None] * 5
-        )
+        if (
+            self.Province
+            and self.City
+            and self.District
+            and self.Living
+            and self.other_city
+        ):
+            return [
+                self.Province,
+                self.City,
+                self.District,
+                self.Living,
+                self.other_city,
+            ]
+        elif (
+            self.Province
+            and self.City
+            and self.District
+            and self.Living
+            and not self.other_city
+        ):
+            return [self.Province, self.City, self.District, self.Living, ""]
+        else:
+            return [None] * 5
 
     def set_living(self, P, C, D, L, O) -> None:
         self.Province = P
