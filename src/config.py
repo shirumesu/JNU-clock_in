@@ -73,7 +73,7 @@ class Config:
             self.pw = None
             self.receiv = None
 
-    def get_user(self, Re: bool = False) -> list[str]:
+    def get_user(self, Re: bool = False) -> List[str]:
         if Re or not (self.UserName and self.Passwd):
             self.UserName = input("请输入你的学号用作登录(仅需首次运行输入一次)")
             self.Passwd = input("请输入你的密码用作登录(仅需首次运行输入一次)")

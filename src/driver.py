@@ -1,6 +1,8 @@
 import time
+import random
 import platform
 import requests
+import numpy as np
 from typing import *
 from loguru import logger
 
@@ -18,14 +20,14 @@ from selenium.common.exceptions import (
 from selenium.webdriver.support import expected_conditions as EC
 
 from .config import Config
-from .yidun import yidun
+
+from .slice import PuzleSolver
 
 
 class Chrome:
     def __init__(self, config: Config = None) -> None:
         """初始化并建立一个chromedriver"""
         self.Config = Config() if not config else config
-        self.yidun = yidun()
 
         if platform.system().lower() == "linux":
             chromium_path = "./source/chromedriver"
@@ -47,14 +49,14 @@ class Chrome:
         self.wait = WebDriverWait(self.driver, 20)
 
         # 将navigator.webdriver设为undefined
-        self.driver.execute_cdp_cmd(
-            "Page.addScriptToEvaluateOnNewDocument",
-            {
-                "source": """Object.defineProperty(navigator, 'webdriver', {
-                    get: () => undefined
-                })"""
-            },
-        )
+        # self.driver.execute_cdp_cmd(
+        #     "Page.addScriptToEvaluateOnNewDocument",
+        #     {
+        #         "source": """Object.defineProperty(navigator, 'webdriver', {
+        #             get: () => undefined
+        #         })"""
+        #     },
+        # )
 
         logger.info("成功开启chromedriver!")
 
@@ -265,10 +267,11 @@ class Chrome:
         Returns:
             bool: 是否成功通过滑条验证
         """
+
         self.save_img()
-        tracks = self.yidun.crack(
-            target_img="./images/target.jpg", template_img="./images/template.png"
-        )
+        tracks = PuzleSolver(
+            r"images\template.png", r"images\target.jpg"
+        ).get_position()
         self.move_to_gap(tracks=tracks)
         return self.Slider_Success()
 
